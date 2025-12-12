@@ -1,0 +1,10 @@
+__pycache__/
+.venv/
+venv/
+.env
+.playwright/
+.pytest_cache/
+.idea/
+.vscode/
+node_modules/
+*.log
