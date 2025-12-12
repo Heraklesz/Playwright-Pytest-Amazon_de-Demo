@@ -1,10 +1,22 @@
+# Python
 __pycache__/
+*.pyc
 .venv/
-venv/
+
+# Playwright artifacts
+playwright-report/
+test-results/
+screenshots/
+videos/
+traces/
+
+# Environment
 .env
-.playwright/
-.pytest_cache/
-.idea/
+
+# IDE
 .vscode/
-node_modules/
-*.log
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
