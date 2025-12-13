@@ -14,7 +14,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 def get_logger(name: str) -> logging.Logger:
     """
     Returns a configured logger instance with console and file handlers.
-     Ensures that multiple handlers are not added to the same logger instance.
+    Ensures that multiple handlers are not added to the same logger instance.
     """
 
     logger = logging.getLogger(name)
