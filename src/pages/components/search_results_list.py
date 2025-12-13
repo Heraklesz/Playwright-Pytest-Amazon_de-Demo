@@ -35,3 +35,10 @@ class SearchResultsList:
         Asserts that at least a given number of results are displayed.
         """
         assert self.get_results_count() >= minimum
+        
+    def click_first_result(self) -> None:
+        """
+        Clicks the first available search result item.
+        """
+        expect(self.items.first).to_be_visible()
+        self.items.first.click()
