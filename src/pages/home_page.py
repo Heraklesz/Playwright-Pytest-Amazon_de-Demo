@@ -32,7 +32,14 @@ class HomePage(BasePage):
 
     def search_for(self, term: str) -> None:
         """
-        Performs a product search using the main search input.
+        Performs a product search using the search submit button.
         """
         self.safe_fill(self.SEARCH_INPUT, term)
         self.safe_click(self.SEARCH_SUBMIT)
+
+    def search_with_enter(self, term: str) -> None:
+        """
+        Performs a product search using the ENTER key.
+        """
+        self.safe_fill(self.SEARCH_INPUT, term)
+        self.page.keyboard.press("Enter")
