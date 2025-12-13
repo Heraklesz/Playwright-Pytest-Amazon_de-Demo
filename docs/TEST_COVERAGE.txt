@@ -1,0 +1,86 @@
+TEST COVERAGE SUMMARY
+=====================
+
+This document provides a high-level overview of the functional and non-functional
+test coverage implemented in this repository. The goal is to demonstrate a
+production-grade automation strategy rather than exhaustive application testing.
+
+--------------------------------------------------
+FUNCTIONAL COVERAGE
+--------------------------------------------------
+
+UI - Core User Flows
+- Home page load and cookie consent handling
+- Product search via search button
+- Product search via ENTER key
+- Search results page rendering
+- Product details page (PDP) load
+- Add product to cart
+- Cart page accessibility and item presence
+
+UI - Search Domain
+- Standard keyword searches
+- Long search strings
+- Special characters
+- Empty search input
+- URL query propagation
+
+UI - Cart Domain
+- Add product to cart via PDP
+- Direct cart page access
+- Empty cart state handling
+
+End-to-End (E2E)
+- Home → Search → Product Details → Cart
+
+--------------------------------------------------
+NON-FUNCTIONAL COVERAGE (LIGHTWEIGHT)
+--------------------------------------------------
+
+Stability & Robustness
+- Edge cases for invalid or unusual user input
+- Graceful handling of empty states
+- No hard-coded sleeps, stable wait strategies only
+
+Network / Backend Health
+- Verification of successful backend network calls triggered by UI actions
+- Detection of HTTP 5xx responses during search operations
+
+API Automation (Demo API)
+- REST API smoke tests
+- Schema validation using typed models
+- Negative and edge case handling (404 responses)
+
+--------------------------------------------------
+TEST CATEGORIZATION
+--------------------------------------------------
+
+Smoke Tests
+- Critical user paths
+- Backend availability signals
+
+Regression Tests
+- Alternative user interaction patterns
+- Input boundary conditions
+- Data structure validation
+
+Edge Tests
+- Invalid inputs
+- Empty states
+- Non-happy-path behavior
+
+Checks
+- Global UI elements (header, cart access)
+- Site health indicators
+
+--------------------------------------------------
+NOTES
+--------------------------------------------------
+
+This test coverage is intentionally scoped to demonstrate:
+- Clean architecture
+- Scalable test design
+- Proper separation of concerns
+- Industry-standard automation practices
+
+It is not intended to replace full production test coverage.

@@ -1,33 +1,100 @@
 # Playwright + Pytest Reference Automation Framework
-This repository demonstrates a production-ready test automation framework using
-Playwright and Pytest, covering UI and API testing best practices.
 
-## Tech Stack
+This repository demonstrates a production-grade test automation framework
+built with Playwright and Pytest. It showcases UI automation, end-to-end
+testing, backend network assertions, and clean REST API automation practices.
+
+--------------------------------------------------
+TECH STACK
+--------------------------------------------------
+
 - Python 3.13
 - Pytest
-- Playwright
+- Playwright (sync API)
 - Requests
-- Black + Ruff
+- Pydantic
+- Black & Ruff
 
-## Project Goals
-- Clean and scalable test architecture
-- UI automation using Page Object Model
-- API automation best practices
-- Clear separation of test categories (smoke, regression, e2e, etc.)
-- CI-ready structure
+--------------------------------------------------
+PROJECT STRUCTURE
+--------------------------------------------------
 
-## Setup
-1. Create and activate virtual environment
-2. Install dependencies
-3. Install Playwright browsers
+- src/
+  - core/          Framework configuration, logging, artifacts
+  - pages/         Page Object Model and UI components
+  - api/           UI-triggered network helpers
+  - api_demo/      Standalone REST API automation demo
+  - utils/         Shared helpers
+- tests/
+  - ui/            Smoke, regression, edge, checks, and E2E tests
+  - amazon_network Network-level assertions triggered by UI flows
+  - api_demo       REST API smoke, regression, and edge tests
+- docs/
+  - TEST_COVERAGE.txt
+  - RUNBOOK_README.txt
 
-## Running Tests
-Run all tests: pass
-Run smoke tests only: pass
-Run UI regression tests: pass
+--------------------------------------------------
+SETUP
+--------------------------------------------------
 
-## Reports & Artifacts
-- Screenshots, videos and traces are captured on failure
-- Artifacts are stored under `test-results/`
+1. Create virtual environment
+   python -m venv .venv
 
-See `docs/RUNBOOK_README.txt` for detailed instructions.
+2. Activate environment
+   .venv\Scripts\activate    (Windows)
+   source .venv/bin/activate (Linux/Mac)
+
+3. Install dependencies
+   pip install -r requirements.txt
+
+4. Install Playwright browsers
+   playwright install
+
+5. Configure environment
+   Copy .env.example to .env
+
+--------------------------------------------------
+RUNNING TESTS
+--------------------------------------------------
+
+Examples:
+
+Run all tests:
+   pytest
+
+Run smoke tests:
+   pytest -m smoke
+
+Run regression tests:
+   pytest -m regression
+
+Run edge tests:
+   pytest -m edge
+
+Run E2E tests:
+   pytest -m e2e
+
+Run Amazon network tests:
+   pytest -m amazon_network
+
+Run demo API tests:
+   pytest -m api_demo
+
+--------------------------------------------------
+DESIGN PRINCIPLES
+--------------------------------------------------
+
+- Page Object Model with component composition
+- Clear separation of test logic and implementation
+- Marker-based test categorization
+- Stable waits, no hard-coded sleeps
+- Failure-based artifact collection
+- CI-ready execution
+
+--------------------------------------------------
+DISCLAIMER
+--------------------------------------------------
+
+This project is intended as a reference implementation to demonstrate
+automation best practices and architectural patterns. It is not affiliated
+with or endorsed by Amazon.
