@@ -1,140 +1,50 @@
 """
-This file defines global Pytest fixtures and hooks for the test framework.
-It manages the lifecycle of Playwright (browser, context, page),
-handles configuration-based setup and teardown, and automatically
-captures artifacts such as screenshots, videos, and traces on test failures.
+Global pytest configuration and Playwright lifecycle management.
+This setup is intentionally defensive to keep CI pipelines stable
+when testing highly protected sites like Amazon.
 """
 
 import pytest
 from playwright.sync_api import sync_playwright
 
-from src.core.config import config
-from src.core.logger import get_logger
-from src.core.artifacts import (
-    ensure_dirs,
-    SCREENSHOT_DIR,
-    TRACE_DIR,
-    VIDEO_DIR,
-    artifact_name,
-)
-
-
-# -----------------------------
-# Global logger
-# -----------------------------
-
-@pytest.fixture(scope="session")
-def logger():
-    """
-    Provides a shared logger instance for the entire test session.
-    """
-    return get_logger("pytest")
-
-
-# -----------------------------
-# Playwright engine
-# -----------------------------
 
 @pytest.fixture(scope="session")
 def playwright_instance():
-    """
-    Starts and stops the Playwright engine for the entire test session.
-    """
-    ensure_dirs()
     with sync_playwright() as p:
         yield p
 
 
-# -----------------------------
-# Browser (session scope)
-# -----------------------------
-
 @pytest.fixture(scope="session")
 def browser(playwright_instance):
-    """
-    Launches the configured browser instance once per test session.
-    CI-safe defaults are applied here.
-    """
-    browser_type = getattr(playwright_instance, config.browser)
-
-    browser = browser_type.launch(
-        headless=True,  # CI always headless
-        slow_mo=config.slow_mo,
+    browser = playwright_instance.chromium.launch(
+        headless=True,
         args=[
+            "--disable-blink-features=AutomationControlled",
             "--no-sandbox",
             "--disable-dev-shm-usage",
-            "--disable-blink-features=AutomationControlled",
         ],
     )
-
     yield browser
     browser.close()
 
 
-# -----------------------------
-# Browser context (per test)
-# -----------------------------
-
 @pytest.fixture(scope="function")
-def context(browser, request):
-    """
-    Creates a new browser context per test function.
-    Handles video and trace recording based on configuration.
-    """
+def context(browser):
     context = browser.new_context(
-        record_video_dir=VIDEO_DIR if config.video_on_fail else None
+        locale="de-DE",
+        viewport={"width": 1400, "height": 900},
+        user_agent=(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        ),
     )
-
-    if config.trace_on_fail:
-        context.tracing.start(screenshots=True, snapshots=True)
-
     yield context
-
-    if request.node.rep_call.failed:
-        test_name = artifact_name(request.node.name)
-
-        if config.trace_on_fail:
-            context.tracing.stop(
-                path=TRACE_DIR / f"{test_name}.zip"
-            )
-
     context.close()
 
 
-# -----------------------------
-# Page (per test)
-# -----------------------------
-
 @pytest.fixture(scope="function")
-def page(context, request):
-    """
-    Creates a new page per test function.
-    Applies CI-safe default timeouts and captures screenshots on failure.
-    """
+def page(context):
     page = context.new_page()
-    page.set_default_timeout(60_000)
-    page.set_default_navigation_timeout(60_000)
-
+    page.set_default_timeout(30_000)
     yield page
-
-    if request.node.rep_call.failed and config.screenshot_on_fail:
-        test_name = artifact_name(request.node.name)
-        page.screenshot(
-            path=SCREENSHOT_DIR / f"{test_name}.png",
-            full_page=True
-        )
-
-
-# -----------------------------
-# Pytest hooks
-# -----------------------------
-
-@pytest.hookimpl(hookwrapper=True, tryfirst=True)
-def pytest_runtest_makereport(item, call):
-    """
-    Pytest hook that attaches the test execution result to the test item.
-    This enables fixtures to detect test failures and react accordingly.
-    """
-    outcome = yield
-    rep = outcome.get_result()
-    setattr(item, "rep_" + rep.when, rep)

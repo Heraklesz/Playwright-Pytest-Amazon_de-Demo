@@ -4,6 +4,11 @@ This repository demonstrates a production-grade test automation framework
 built with Playwright and Pytest. It showcases UI automation, end-to-end
 testing, backend network assertions, and clean REST API automation practices.
 
+NOTE
+Amazon heavily protects its frontend with anti-automation mechanisms including bot detection, region-specific consent flows, iframe-based cookie banners and dynamic DOM variations.
+These mechanisms intentionally make external UI automation unreliable.
+For this reason, the test framework prioritizes stability and determinism by using defensive waits and conditional skips when the environment blocks automated interaction.
+
 --------------------------------------------------
 TECH STACK
 --------------------------------------------------
