@@ -19,6 +19,10 @@ from src.core.artifacts import (
 )
 
 
+# -----------------------------
+# Global logger
+# -----------------------------
+
 @pytest.fixture(scope="session")
 def logger():
     """
@@ -26,6 +30,10 @@ def logger():
     """
     return get_logger("pytest")
 
+
+# -----------------------------
+# Playwright engine
+# -----------------------------
 
 @pytest.fixture(scope="session")
 def playwright_instance():
@@ -37,19 +45,35 @@ def playwright_instance():
         yield p
 
 
+# -----------------------------
+# Browser (session scope)
+# -----------------------------
+
 @pytest.fixture(scope="session")
 def browser(playwright_instance):
     """
     Launches the configured browser instance once per test session.
+    CI-safe defaults are applied here.
     """
     browser_type = getattr(playwright_instance, config.browser)
+
     browser = browser_type.launch(
-        headless=config.headless,
+        headless=True,  # CI always headless
         slow_mo=config.slow_mo,
+        args=[
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-blink-features=AutomationControlled",
+        ],
     )
+
     yield browser
     browser.close()
 
+
+# -----------------------------
+# Browser context (per test)
+# -----------------------------
 
 @pytest.fixture(scope="function")
 def context(browser, request):
@@ -77,12 +101,20 @@ def context(browser, request):
     context.close()
 
 
+# -----------------------------
+# Page (per test)
+# -----------------------------
+
 @pytest.fixture(scope="function")
 def page(context, request):
     """
-    Creates a new page per test function and captures screenshots on failure.
+    Creates a new page per test function.
+    Applies CI-safe default timeouts and captures screenshots on failure.
     """
     page = context.new_page()
+    page.set_default_timeout(60_000)
+    page.set_default_navigation_timeout(60_000)
+
     yield page
 
     if request.node.rep_call.failed and config.screenshot_on_fail:
@@ -92,6 +124,10 @@ def page(context, request):
             full_page=True
         )
 
+
+# -----------------------------
+# Pytest hooks
+# -----------------------------
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
 def pytest_runtest_makereport(item, call):
