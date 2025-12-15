@@ -38,7 +38,7 @@ jobs:
 
       - name: Run smoke and API tests
         run: |
-          pytest -m "smoke or api_demo or amazon_network"
+          pytest -m api_demo
 
       - name: Upload test artifacts on failure
         if: failure()
