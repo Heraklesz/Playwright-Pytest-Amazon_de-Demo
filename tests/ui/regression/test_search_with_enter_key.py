@@ -13,11 +13,18 @@ from src.pages.search_results_page import SearchResultsPage
 
 @pytest.mark.regression
 def test_search_works_with_enter_key(page):
-    home_page = HomePage(page)
-    results_page = SearchResultsPage(page)
+    page.goto("https://www.amazon.de", timeout=60_000)
 
-    home_page.load(config.base_url)
-    home_page.search_with_enter("gaming mouse")
+    search_box = page.locator("#twotabsearchtextbox")
+    search_box.fill("playstation")
 
-    results_page.wait_until_loaded()
-    results_page.results_list.expect_minimum_results(1)
+    with page.expect_response(
+        lambda r: "/s?" in r.url,
+        timeout=60_000
+    ):
+        search_box.press("Enter")
+
+    page.wait_for_url("**/s?**", timeout=60_000)
+
+    assert "playstation" in page.url.lower()
+

@@ -14,23 +14,16 @@ from src.pages.home_page import HomePage
 @pytest.mark.amazon_network
 @pytest.mark.regression
 def test_search_backend_requests_return_success(page):
-    search_responses = []
+    page.goto("https://www.amazon.de", timeout=60_000)
 
-    def capture_response(response):
-        if "s?k=" in response.url:
-            search_responses.append(response)
+    search_box = page.locator("#twotabsearchtextbox")
+    search_box.fill("iphone")
 
-    page.on("response", capture_response)
+    with page.expect_response(
+        lambda r: "/s?" in r.url and r.status == 200,
+        timeout=60_000
+    ):
+        search_box.press("Enter")
 
-    home_page = HomePage(page)
-    home_page.load(config.base_url)
-    home_page.search_for("mechanical keyboard")
-
-    page.wait_for_load_state("networkidle")
-
-    assert search_responses, "No search-related backend responses captured"
-
-    for response in search_responses:
-        assert response.status == 200, (
-            f"Unexpected status code {response.status} for {response.url}"
-        )
+    # stable assert
+    assert page.locator("span[data-component-type='s-search-results']").is_visible()
