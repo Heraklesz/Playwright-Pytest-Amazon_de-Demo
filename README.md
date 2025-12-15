@@ -103,3 +103,29 @@ DISCLAIMER
 This project is intended as a reference implementation to demonstrate
 automation best practices and architectural patterns. It is not affiliated
 with or endorsed by Amazon.
+
+
+Jenkis scheduled cron jobs screenshots.
+![alt text](image.png)
+![alt text](image-1.png)
+
+ENV script:
+set PYTHON=C:\Users\Levi\AppData\Local\Programs\Python\Python313\python.exe
+set PLAYWRIGHT_BROWSERS_PATH=%WORKSPACE%\pw-browsers
+
+%PYTHON% -m venv .venv
+
+call .venv\Scripts\activate
+
+.venv\Scripts\python.exe -m pip install --upgrade pip
+.venv\Scripts\pip.exe install -r requirements.txt
+.venv\Scripts\pip.exe install pytest-html
+
+.venv\Scripts\python.exe -m playwright install chromium
+
+copy .env.example .env
+
+.venv\Scripts\pytest.exe -m regression ^
+  --junitxml=test-results/junit.xml ^
+  --html=test-results/report.html ^
+  --self-contained-html
